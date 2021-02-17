@@ -2,17 +2,21 @@ let express = require('express');
 let mongoose = require('mongoose');
 let cookieParser = require('cookie-parser');
 
+
 let bodyParser = require('body-parser');
 let cors = require('cors');
-
-const routes = require('./routes/index');
 
 const app = express();
 
 app.use(cors());
+//this may need to move to line 19 under cookie parser and check what the app does
+// without lines 21 and 22
 
-app.use(express.json);
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+
 app.use(cookieParser());
 
 app.use(bodyParser.json());
@@ -32,6 +36,10 @@ db.mongoose.connect(db.uri, {
     process.exit();
 });
 
-app.use(routes);
+app.use('/', require('./routes/users'));
 
-module.exports = app;
+app.use(function (err, req, res, next) {
+    console.error(err.message);
+    if (!err.statusCode) err.statusCode = 500;
+    res.status(err.statusCode).send(err.message);
+});

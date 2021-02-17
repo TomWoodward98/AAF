@@ -1,33 +1,33 @@
 const db = require('../models/user');
 const User = db;
+const bcrypt = require('bcryptjs');
 
 exports.create = (req, res) => {
-    // Validate request
-  if (!req.body.name) {
-    res.status(400).send({ name: "Name can not be empty!" });
+  if (!req.body.email) {
+    res.status(400).send({ email: "Email cannot be empty!" });
     return;
   }
   
   if (!req.body.password) {
-    res.status(400).send({ password: "Password can not be empty!" });
+    res.status(400).send({ password: "Password cannot be empty!" });
     return;
   }
 
-  // Create a User model object
-  const user = new User({
-    name: req.body.name,
-    password: req.body.password
-  });
+  const { email, password } = req.body;
+  const user = new User({ email, password });
 
-  // Save User in the database
-  user.save().then(data => {
-      console.log("User saved in the database: " + data);
-      res.send(data);
-    }).catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while creating the User."
+  bcrypt.genSalt(10, (err, salt) => {
+    bcrypt.hash(user.password, salt, (err, hash) => {
+      if (err) throw err;
+      user.password = hash;
+      user.save(function(err) {
+        if (err) {
+          console.log(err);
+          res.status(500).send("Error registering your account, try again.");
+        } else {
+          res.status(200).send("you have successfully registered!");
+        }
       });
+    });
   });
-
 };
