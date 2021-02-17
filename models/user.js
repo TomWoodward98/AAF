@@ -4,10 +4,13 @@ const bcrypt = require('bcryptjs');
 
 let userSchema = new Schema({
   email: {
-    type: String
+    type: String,
+    required: true,
+    unique: true,
   },
   password: {
-    type: String
+    type: String,
+    required: true,
   }
 }, {
     collection: 'users'

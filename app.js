@@ -1,3 +1,4 @@
+require('dotenv').config();
 let express = require('express');
 let mongoose = require('mongoose');
 let cookieParser = require('cookie-parser');
@@ -8,7 +9,7 @@ let cors = require('cors');
 
 const app = express();
 
-app.use(cors());
+// app.use(cors());
 //this may need to move to line 19 under cookie parser and check what the app does
 // without lines 21 and 22
 
@@ -19,8 +20,15 @@ app.use(bodyParser.urlencoded({
 
 app.use(cookieParser());
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true}));
+app.use(cors({
+    origin: [
+        'http://localhost:8080',
+    ],
+    credentials: true,
+}));
+
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true}));
 
 const db = require('./models');
 db.mongoose.connect(db.uri, {
