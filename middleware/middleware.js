@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const secretssh = process.env.SECRET_SSH
+const secret = process.env.SECRET
 const withAuth = function(req, res, next) {
     const token =
         req.body.token ||
@@ -9,10 +9,11 @@ const withAuth = function(req, res, next) {
         req.cookies.token
     ;
 
+    console.log(req, req.cookies);
     if (!token) {
         res.status(401).send('Unauthorized: No token provided');
     } else {
-        jwt.verify(token, secretssh, function(err, decoded) {
+        jwt.verify(token, secret, function(err, decoded) {
             if (err) {
                 res.status(401).send('Unauthorized: Invalid token');
             } else {
