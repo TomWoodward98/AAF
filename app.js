@@ -9,10 +9,6 @@ let cors = require('cors');
 
 const app = express();
 
-// app.use(cors());
-//this may need to move to line 19 under cookie parser and check what the app does
-// without lines 21 and 22
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
@@ -26,9 +22,6 @@ app.use(cors({
     ],
     credentials: true,
 }));
-
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true}));
 
 const db = require('./models');
 db.mongoose.connect(db.uri, {
@@ -45,6 +38,7 @@ db.mongoose.connect(db.uri, {
 });
 
 app.use('/', require('./routes/users'));
+app.use('/ticket', require('./routes/ticket'));
 
 app.use(function (err, req, res, next) {
     console.error(err.message);

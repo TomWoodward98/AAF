@@ -11,8 +11,8 @@ router.get('/api/secret', withAuth, function(req, res) {
   res.send('You are securely logged in');
 });
 
-router.get('/checkToken', withAuth, function(req, res) {
-  res.sendStatus(200);
-});
+// router.get('/checkToken', withAuth, function(req, res) {
+//   res.sendStatus(200);
+// });
   
 module.exports = router;
