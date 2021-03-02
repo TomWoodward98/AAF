@@ -31,17 +31,18 @@ exports.create = (req, res) => {
             console.log(ticket);
             res.status(500).send("Error creating your ticket, try again.");
         } else {
-            res.status(200).send("you have successfully created a ticket!");
+            res.send(ticket, 200);
         }
     });
 };
 
 exports.get = (req, res) => {
-    Ticket.find({}, function(err, tickets) {
-        if (err) {
-            return next(err)
-        } else {
-            res.json(tickets, 200);
-        }
-    })
+    console.log('Hallo');
+    Ticket.find().then(data => {
+        res.send(data);
+    }).catch(err => {
+        res.status(500).send({
+        message:err.message || "Some error occurred while retrieving Tickets."
+    });
+  });
 };
