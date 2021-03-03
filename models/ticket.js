@@ -16,6 +16,11 @@ let ticketSchema = new Schema({
     ref: 'User',
     required: false,
   },
+  raised_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
   created_by: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'

@@ -18,31 +18,46 @@ exports.create = (req, res) => {
         return;
     }
 
+    if (!req.body.raisedBy) {
+        res.status(400).send({ info: "The ticket has to be raised by someone!" });
+        return;
+    }
+
     const created_by = funct.user._id;
-    const { info, title, allocatedTo } = req.body;
+    const { info, title, allocatedTo, raisedBy } = req.body;
 
     const allocated_to = allocatedTo ? allocatedTo._id : null;
+    const raised_by = raisedBy._id;
 
-    const ticket = new Ticket({ title, info, allocated_to, created_by });
-
+    const ticket = new Ticket({ title, info, allocated_to, created_by, raised_by });
+    
     ticket.save(function(err) {
         if (err) {
             console.log(err);
-            console.log(ticket);
             res.status(500).send("Error creating your ticket, try again.");
         } else {
-            res.send(ticket, 200);
+            const newTicket = 
+            {
+                _id: ticket._id,
+                title: ticket.title,
+                info: ticket.info,
+                allocated_to: req.body.allocatedTo,
+                created_by: funct.user,
+                raised_by: req.body.raisedBy,
+                created_at: ticket.created_at,
+            }
+            res.send(newTicket, 200);
         }
     });
 };
 
 exports.get = (req, res) => {
-    console.log('Hallo');
-    Ticket.find().then(data => {
+    Ticket.find().populate(['created_by', 'allocated_to', 'raised_by']).exec(function (err, data) {
+        if (err) {
+            res.status(500).send({
+                message:err.message || "Some error occurred while retrieving Tickets."
+            });
+        }
         res.send(data);
-    }).catch(err => {
-        res.status(500).send({
-        message:err.message || "Some error occurred while retrieving Tickets."
     });
-  });
 };

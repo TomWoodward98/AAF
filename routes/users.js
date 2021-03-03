@@ -9,6 +9,7 @@ router.post('/api/register', UserController.create);
 router.post('/api/login',  LoginController.login);
 
 router.get('/api/getUsers', UserController.get);
+router.get('/api/get-user-type', UserController.userTypes);
 
 router.get('/checkToken', withAuth, function(req, res) {
     res.sendStatus(200);
