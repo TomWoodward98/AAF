@@ -1,5 +1,5 @@
-const db = require('../models/department');
-const Department = db;
+const db = require('../models/column');
+const Column = db;
 
 exports.create = (req, res) => {
 
@@ -9,24 +9,24 @@ exports.create = (req, res) => {
     }
 
     const { name } = req.body;
-    const department = new Department({ name });
+    const column = new Column({ name });
 
-    department.save(function(err) {
+    column.save(function(err) {
         if (err) {
             console.log(err);
-            res.status(500).send("Error creating a department, try again.");
+            res.status(500).send("Error creating a column, try again.");
         } else {
-            res.send(department, 200);
+            res.send(column, 200);
         }
     });
 };
 
 exports.get = (req, res) => {
-    Department.find().then(data => {
+    Column.find().then(data => {
         res.send(data);
     }).catch(err => {
         res.status(500).send({
-            message: err.message || "Some error occurred while retrieving Departments."
+            message: err.message || "Some error occurred while retrieving Columns."
         });
     });
 };

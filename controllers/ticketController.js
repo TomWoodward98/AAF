@@ -1,4 +1,6 @@
 const db = require('../models/ticket');
+const db_status = require('../models/column');
+const Status = db_status;
 const Ticket = db;
 const jwt = require('jsonwebtoken');
 
@@ -29,8 +31,17 @@ exports.create = (req, res) => {
     const allocated_to = allocatedTo ? allocatedTo._id : null;
     const raised_by = raisedBy._id;
 
-    const ticket = new Ticket({ title, info, allocated_to, created_by, raised_by });
+    const statuses = req.status
+    let statusDoc;
+    for (i = 0; i < statuses.length; i++) {
+        if (statuses[i].name === "Open") {
+            statusDoc = statuses[i];
+        }
+    }
     
+    const status = statusDoc._id;
+
+    const ticket = new Ticket({ title, info, allocated_to, created_by, raised_by, status });
     ticket.save(function(err) {
         if (err) {
             console.log(err);
@@ -44,6 +55,7 @@ exports.create = (req, res) => {
                 allocated_to: req.body.allocatedTo,
                 created_by: funct.user,
                 raised_by: req.body.raisedBy,
+                status: statusDoc,
                 created_at: ticket.created_at,
             }
             res.send(newTicket, 200);
@@ -52,7 +64,7 @@ exports.create = (req, res) => {
 };
 
 exports.get = (req, res) => {
-    Ticket.find().populate(['created_by', 'allocated_to', 'raised_by']).exec(function (err, data) {
+    Ticket.find().populate(['created_by', 'allocated_to', 'raised_by', 'status']).exec(function (err, data) {
         if (err) {
             res.status(500).send({
                 message:err.message || "Some error occurred while retrieving Tickets."
