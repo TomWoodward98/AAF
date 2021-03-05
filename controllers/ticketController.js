@@ -1,8 +1,7 @@
 const db = require('../models/ticket');
-const db_status = require('../models/column');
-const Status = db_status;
 const Ticket = db;
 const jwt = require('jsonwebtoken');
+const ObjectID = require('mongodb').ObjectID;
 
 const secret = process.env.SECRET
 
@@ -72,4 +71,57 @@ exports.get = (req, res) => {
         }
         res.send(data);
     });
+};
+
+exports.update = (req, res) => {
+    if (!req.body.title) {
+        res.status(400).send({ title: "Title cannot be empty!" });
+        return;
+    }
+  
+    if (!req.body.info) {
+        res.status(400).send({ info: "The ticket description cannot be empty!" });
+        return;
+    }
+
+    if (!req.body.status) {
+        res.status(400).send({ info: "The ticket has to have a status!" });
+        return;
+    }
+
+    if (!req.body.allocatedTo) {
+        res.status(400).send({ info: "The ticket has to be allocated by someone!" });
+        return;
+    }
+    const ticket = req.body.ticket
+    const { info, title, allocatedTo } = req.body;
+    const id = ticket._id;
+    const allocated_to = allocatedTo._id;
+    const status = req.body.status._id
+    console.log(info, title, allocated_to, status);
+    Ticket.findByIdAndUpdate(
+        ObjectID(id), 
+        {
+            $set: {title: title, info: info, allocated_to: allocated_to, status: status},
+        }, 
+        function(err, doc) {
+            if (err) {
+                console.log(err);
+                res.status(500).send("Error editting your ticket, try again.");
+            } else {
+                const updatedTicket = 
+                {
+                    _id: ticket._id,
+                    title: title,
+                    info: info,
+                    allocated_to: allocatedTo,
+                    created_by: ticket.created_by,
+                    raised_by: ticket.raised_by,
+                    status: req.body.status,
+                    created_at: ticket.created_at,
+                }
+                res.status(200).send(updatedTicket);            
+            }
+        }
+    );  
 };

@@ -36,14 +36,19 @@ exports.login = (req, res) => {
               { password: 'Incorrect email or password wrong tbh'}
             ]
           });
+        } else if (!user.approved) {
+          res.status(200).json({  //401
+            Error: [
+              { approved: 'Your account has not been approved yet, please contact a site admin'},
+            ]
+          });
         } else {
-            // Session Issue token
+          // Session Issue token
           const payload = { user };
           const token = jwt.sign(payload, secret, {
             expiresIn: '1h'
           });
-          res.cookie('token', token, { httpOnly: true }).status(200)
-          .json({
+          res.cookie('token', token, { httpOnly: true }).status(200).json({
             Success: {
               user: user,
               jwt: token,

@@ -8,6 +8,8 @@ const ColumnController = require('../controllers/columnController');
 
 router.post('/create-ticket', [withAuth, getStatuses], TicketController.create);
 router.get('/get-tickets', withAuth, TicketController.get);
+router.post('/update-ticket', [withAuth, getStatuses], TicketController.update);
+
 router.post('/create-column', withAuth, ColumnController.create);
 router.get('/get-columns', withAuth, ColumnController.get);
 

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bcrypt = require('bcryptjs');
+const { MongoError } = require('mongodb');
 
 let userSchema = new Schema({
   title: {
@@ -31,7 +32,11 @@ let userSchema = new Schema({
   user_type: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'UserType'
-  }
+  },
+  approved: {
+    type: Boolean,
+    default: false,
+  },
 }, {
     collection: 'users'
 });
@@ -45,5 +50,13 @@ userSchema.methods.isCorrectPassword = function(password, callback) {
     }
   });
 }
+
+// userSchema.methods.isApproved = function(user, callback) {
+//   if (user.approved) {
+//     return true;
+//   } else {
+//     return false;
+//   }
+// }
 
 module.exports = mongoose.model('User', userSchema)
