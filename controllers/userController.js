@@ -32,6 +32,7 @@ exports.create = (req, res) => {
     res.status(200).send({ errors: [{ department: "Department cannot be empty!" }]});
     return;
   }
+
   if (!req.body.user_type) {
     res.status(200).send({ errors: [{ user_type: "Permisson type cannot be empty!" }]});
     return;
@@ -149,7 +150,6 @@ exports.update = (req, res) => {
 
 exports.userTypes = (req, res) => {
   UserType.find().then(data => {
-    console.log('Types: ', data);
     res.send(data);
   }).catch(err => {
     res.status(500).send({
@@ -190,4 +190,16 @@ exports.approveUser = (req, res) => {
       }
     }
   );
+};
+
+exports.currentUser = (req, res) => {
+  let user = req.user.toObject();
+
+  let isAdmin = user.user_type.type === 'admin' ? true : false;
+  let isClient = user.user_type.type === 'client' ? true : false;
+  let isSupport = user.user_type.type === 'support' ? true : false;
+  user.isAdmin = isAdmin;
+  user.isClient = isClient;
+  user.isSupport = isSupport;
+  res.send(user);
 };

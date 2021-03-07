@@ -51,12 +51,4 @@ userSchema.methods.isCorrectPassword = function(password, callback) {
   });
 }
 
-// userSchema.methods.isApproved = function(user, callback) {
-//   if (user.approved) {
-//     return true;
-//   } else {
-//     return false;
-//   }
-// }
-
 module.exports = mongoose.model('User', userSchema)

@@ -5,7 +5,7 @@ const withAuth = require('../middleware/middleware')
 const DepartmentController = require('../controllers/departmentController');
 
 router.post('/create-department', withAuth, DepartmentController.create);
-router.get('/get-departments', withAuth, DepartmentController.get);
+router.get('/get-departments', DepartmentController.get);
 
 
 module.exports = router;
