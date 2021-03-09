@@ -7,41 +7,26 @@ const secret = process.env.SECRET
 // TODO - Maybe seperate into email and password IF's
 exports.login = (req, res) => {
   const { email, password } = req.body;
-  User.findOne({ email }, function(err, user) {
+  User.findOne({ email }).select(['+email', '+password']).exec(function(err, user) {
+    let Error = {};
     if (err) {
-      console.error(err);
-      res.json({
-        Error: [
-          { server: 'Internal error please try again' }
-        ]
-      }, 200); //500
+      Error.server = 'Internal error please try again';
+      res.json({Error}, 200); //500
     } else if (!user) {
-      res.json({
-        Error: [
-          { email: 'This user does not exist' }
-        ]
-      }, 200); //401
+      Error.email = 'This user does not exist';
+      res.json({Error}, 200); //401
     } else {
       user.isCorrectPassword(password, function(err, same) {
         if (err) {
-          res.status(500)
-            .json({
-            Error: 'Internal error please try again'
-          });
+          Error.server = 'Internal error please try again';
+          res.json({Error}, 500);
         } else if (!same) {
-          res.status(200) //401
-          .json({
-            Error: [
-              { email: 'Incorrect email or password'},
-              { password: 'Incorrect email or password wrong tbh'}
-            ]
-          });
+          Error.email = 'Incorrect email or password';
+          Error.password = 'Incorrect email or password';
+          res.json({Error}, 200); //401
         } else if (!user.approved) {
-          res.status(200).json({  //401
-            Error: [
-              { approved: 'Your account has not been approved yet, please contact a site admin'},
-            ]
-          });
+          Error.approved = 'Your account has not been approved yet, please contact a site admin';
+          res.json({Error}, 200); //401
         } else {
           // Session Issue token
           const payload = { user };
@@ -56,6 +41,19 @@ exports.login = (req, res) => {
           });
         }
       });
+    }
+  });
+};
+
+exports.logout = (req, res) => {
+  const user = req.currentUser
+  const payload = { user };
+  const token = jwt.sign(payload, secret, {
+    expiresIn: Date.now()
+  });
+  res.cookie('token', token, { httpOnly: true }).status(200).json({
+    Success: {
+      jwt: token,
     }
   });
 };

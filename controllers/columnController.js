@@ -13,7 +13,6 @@ exports.create = (req, res) => {
 
     column.save(function(err) {
         if (err) {
-            console.log(err);
             res.status(500).send("Error creating a column, try again.");
         } else {
             res.send(column, 200);

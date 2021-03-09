@@ -1,19 +1,36 @@
 const express = require('express');
 const router = express.Router();
-const withAuth = require('../middleware/middleware')
-const currentUser = require('../middleware/currentUser')
+
+// ---------------------- User middleware --------------------------------\\
+const currentUser = require('../middleware/currentUser');
+// ------------------------------------------------------------------------\\
+
+// ---------------------- Auth middleware --------------------------------\\
+const withAuth = require('../middleware/auth/withAuth');
+const authAdmin = require('../middleware/auth/authAdmin');
+const authSupport = require('../middleware/auth/authSupport');
+const authAdminSupport = require('../middleware/auth/authAdminSupport');
+// ------------------------------------------------------------------------\\
+
+// ---------------------- Validation middleware --------------------------------\\
+const loginValid = require('../middleware/validation/loginValid');
+const regValid = require('../middleware/validation/regValid');
+// ------------------------------------------------------------------------\\
 
 const UserController = require('../controllers/userController');
 const LoginController = require('../controllers/loginController');
 
-router.post('/api/register', UserController.create);
-router.post('/api/login',  LoginController.login);
+router.post('/api/register', regValid, UserController.create);
+router.post('/api/login', loginValid, LoginController.login);
+router.post('/api/logout', withAuth,  LoginController.logout);
 
-router.post('/api/update-user', withAuth, UserController.update);
-router.get('/api/getUsers', withAuth, UserController.get);
-router.get('/api/get-current-user', currentUser, UserController.currentUser);
+router.post('/api/update-user', authAdmin, UserController.update); // Admin protection
+router.get('/api/get-users', authAdminSupport, UserController.get); // Admin and Support
+router.post('/api/delete-user', authAdmin, UserController.delete); //Admin protection
+
+router.get('/api/get-current-user', currentUser, UserController.currentUser); //WithAuth
 router.get('/api/get-user-type', UserController.userTypes);
-router.post('/api/approve-user', withAuth, UserController.approveUser);
+router.post('/api/approve-user', authAdmin, UserController.approveUser); // Admin Protection
 
 router.get('/checkToken', withAuth, function(req, res) {
     res.sendStatus(200);

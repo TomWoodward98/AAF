@@ -2,6 +2,7 @@ const db = require('../models/ticket');
 const Ticket = db;
 const jwt = require('jsonwebtoken');
 const ObjectID = require('mongodb').ObjectID;
+const user = require('../models/user');
 
 const secret = process.env.SECRET
 
@@ -43,7 +44,6 @@ exports.create = (req, res) => {
     const ticket = new Ticket({ title, info, allocated_to, created_by, raised_by, status });
     ticket.save(function(err) {
         if (err) {
-            console.log(err);
             res.status(500).send("Error creating your ticket, try again.");
         } else {
             const newTicket = 
@@ -63,14 +63,25 @@ exports.create = (req, res) => {
 };
 
 exports.get = (req, res) => {
-    Ticket.find().populate(['created_by', 'allocated_to', 'raised_by', 'status']).exec(function (err, data) {
-        if (err) {
-            res.status(500).send({
-                message:err.message || "Some error occurred while retrieving Tickets."
-            });
-        }
-        res.send(data);
-    });
+    if (req.user.user_type.type === 'client') {
+        Ticket.find({'raised_by': req.user._id}).populate(['created_by', 'allocated_to', 'raised_by', 'status']).exec(function (err, data) {
+            if (err) {
+                res.status(500).send({
+                    message:err.message || "Some error occurred while retrieving Tickets."
+                });
+            }
+            res.send(data);
+        });
+    } else {
+        Ticket.find().populate(['created_by', 'allocated_to', 'raised_by', 'status']).exec(function (err, data) {
+            if (err) {
+                res.status(500).send({
+                    message:err.message || "Some error occurred while retrieving Tickets."
+                });
+            }
+            res.send(data);
+        });
+    }
 };
 
 exports.update = (req, res) => {
@@ -89,16 +100,11 @@ exports.update = (req, res) => {
         return;
     }
 
-    if (!req.body.allocatedTo) {
-        res.status(400).send({ info: "The ticket has to be allocated by someone!" });
-        return;
-    }
-    const ticket = req.body.ticket
+    const ticket = req.body.ticket;
     const { info, title, allocatedTo } = req.body;
     const id = ticket._id;
-    const allocated_to = allocatedTo._id;
-    const status = req.body.status._id
-    console.log(info, title, allocated_to, status);
+    const allocated_to = allocatedTo ? allocatedTo._id : null;
+    const status = req.body.status._id;
     Ticket.findByIdAndUpdate(
         ObjectID(id), 
         {
@@ -106,7 +112,6 @@ exports.update = (req, res) => {
         }, 
         function(err, doc) {
             if (err) {
-                console.log(err);
                 res.status(500).send("Error editting your ticket, try again.");
             } else {
                 const updatedTicket = 

@@ -6,39 +6,7 @@ const bcrypt = require('bcryptjs')
 const ObjectID = require('mongodb').ObjectID;
 
 exports.create = (req, res) => {
-  if (!req.body.title) {
-    res.status(200).send({ errors: [{ title: "Title cannot be empty!" }]});
-    return;
-  }
-  if (!req.body.first_name) {
-    res.status(200).send({ errors: [{ first_name: "First name cannot be empty!" }]});
-    return;
-  }
-  if (!req.body.last_name) {
-    res.status(200).send({ errors: [{ last_name: "Last name cannot be empty!" }]});
-    return;
-  }
-  if (!req.body.email) {
-    res.status(200).send({ errors: [{ email: "Email cannot be empty!" }]});
-    return;
-  }
-  
-  if (!req.body.password) {
-    res.status(200).send({ errors: [{ password: "Password cannot be empty!" }]});
-    return;
-  }
-
-  if (!req.body.department) {
-    res.status(200).send({ errors: [{ department: "Department cannot be empty!" }]});
-    return;
-  }
-
-  if (!req.body.user_type) {
-    res.status(200).send({ errors: [{ user_type: "Permisson type cannot be empty!" }]});
-    return;
-  }
-
-  const approved = req.body.approved != null ? req.body.approved : false;
+   const approved = req.body.approved != null ? req.body.approved : false;
 
   const department = req.body.department._id
   const user_type = req.body.user_type._id
@@ -51,10 +19,20 @@ exports.create = (req, res) => {
       user.password = hash;
       user.save(function(err) {
         if (err) {
-          console.log(err);
           res.status(500).send("Error creating your user, try again.");
         } else {
-          res.send(user, 200);
+          const createdUser = 
+            {
+              _id: user._id,
+              title: user.title,
+              first_name: user.first_name, 
+              last_name: user.last_name, 
+              email: user.email, 
+              department: req.body.department,
+              user_type: req.body.user_type,
+              approved: user.approved,
+            }
+          res.send(createdUser, 200);
         }
       });
     });
@@ -126,7 +104,6 @@ exports.update = (req, res) => {
         },
         function(err, doc) {
           if (err) {
-              console.log(err);
               res.status(500).send("Error editting this user, try again.");
           } else {
               const updatedUser = 
@@ -145,6 +122,22 @@ exports.update = (req, res) => {
         }
       );
     });
+  });
+};
+
+exports.delete = (req, res) => {
+  if (!req.body.userId) {
+    res.status(200).send({ errors: [{ user: "No user has been provided!" }]});
+    return;
+  }
+  let userId = req.body.userId;
+
+  User.deleteOne( { "_id" : userId }, function(err, user) {
+    if (err) {
+        res.status(500).send("Error deleting this user, try again.");
+    } else {
+        res.status(200).send(user);            
+    }
   });
 };
 
@@ -172,7 +165,6 @@ exports.approveUser = (req, res) => {
     },
     function(err, doc) {
       if (err) {
-          console.log(err);
           res.status(500).send("Error approving this user, try again.");
       } else {
           const approvedUser = 
