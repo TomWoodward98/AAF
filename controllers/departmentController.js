@@ -2,12 +2,6 @@ const db = require('../models/department');
 const Department = db;
 
 exports.create = (req, res) => {
-
-    if (!req.body.name) {
-        res.status(400).send({ name: "Name cannot be empty!" });
-        return;
-    }
-
     const { name } = req.body;
     const department = new Department({ name });
 

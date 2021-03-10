@@ -9,7 +9,7 @@ const loginValid = function(req, res, next) {
     } 
     
     if (JSON.stringify(Error) !== '{}') {
-        res.json({Error});
+        res.status(200).json({Error});
         return
     }
     next();

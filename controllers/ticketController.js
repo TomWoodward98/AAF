@@ -2,28 +2,12 @@ const db = require('../models/ticket');
 const Ticket = db;
 const jwt = require('jsonwebtoken');
 const ObjectID = require('mongodb').ObjectID;
-const user = require('../models/user');
 
 const secret = process.env.SECRET
 
 exports.create = (req, res) => {
     const token = req.cookies.token;
     const funct = jwt.verify(token, secret);
-
-    if (!req.body.title) {
-        res.status(400).send({ title: "Title cannot be empty!" });
-        return;
-    }
-  
-    if (!req.body.info) {
-        res.status(400).send({ info: "The ticket description cannot be empty!" });
-        return;
-    }
-
-    if (!req.body.raisedBy) {
-        res.status(400).send({ info: "The ticket has to be raised by someone!" });
-        return;
-    }
 
     const created_by = funct.user._id;
     const { info, title, allocatedTo, raisedBy } = req.body;
@@ -85,26 +69,13 @@ exports.get = (req, res) => {
 };
 
 exports.update = (req, res) => {
-    if (!req.body.title) {
-        res.status(400).send({ title: "Title cannot be empty!" });
-        return;
-    }
-  
-    if (!req.body.info) {
-        res.status(400).send({ info: "The ticket description cannot be empty!" });
-        return;
-    }
-
-    if (!req.body.status) {
-        res.status(400).send({ info: "The ticket has to have a status!" });
-        return;
-    }
-
     const ticket = req.body.ticket;
-    const { info, title, allocatedTo } = req.body;
+
     const id = ticket._id;
-    const allocated_to = allocatedTo ? allocatedTo._id : null;
-    const status = req.body.status._id;
+    const title = req.body.title ? req.body.title :  ticket.title;
+    const info = req.body.info ? req.body.info :  ticket.info;
+    const status = req.body.status ? req.body.status._id :  ticket.status._id;
+    const allocated_to = req.body.allocatedTo ? req.body.allocatedTo._id : ticket.allocated_to;
     Ticket.findByIdAndUpdate(
         ObjectID(id), 
         {
@@ -116,13 +87,13 @@ exports.update = (req, res) => {
             } else {
                 const updatedTicket = 
                 {
-                    _id: ticket._id,
+                    _id: id,
                     title: title,
                     info: info,
-                    allocated_to: allocatedTo,
+                    allocated_to: req.body.allocatedTo ? req.body.allocatedTo : ticket.allocated_to,
                     created_by: ticket.created_by,
                     raised_by: ticket.raised_by,
-                    status: req.body.status,
+                    status: req.body.status ? req.body.status : ticket.status,
                     created_at: ticket.created_at,
                 }
                 res.status(200).send(updatedTicket);            

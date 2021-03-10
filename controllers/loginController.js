@@ -11,22 +11,22 @@ exports.login = (req, res) => {
     let Error = {};
     if (err) {
       Error.server = 'Internal error please try again';
-      res.json({Error}, 200); //500
+      res.status(200).json({Error}) //500
     } else if (!user) {
       Error.email = 'This user does not exist';
-      res.json({Error}, 200); //401
+      res.status(200).json({Error}) //401
     } else {
       user.isCorrectPassword(password, function(err, same) {
         if (err) {
           Error.server = 'Internal error please try again';
-          res.json({Error}, 500);
+          res.status(500).json({Error}) //500
         } else if (!same) {
           Error.email = 'Incorrect email or password';
           Error.password = 'Incorrect email or password';
-          res.json({Error}, 200); //401
+          res.status(200).json({Error}) //401
         } else if (!user.approved) {
           Error.approved = 'Your account has not been approved yet, please contact a site admin';
-          res.json({Error}, 200); //401
+          res.status(200).json({Error}) //401
         } else {
           // Session Issue token
           const payload = { user };

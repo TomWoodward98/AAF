@@ -1,5 +1,4 @@
 const regValid = function(req, res, next) {
-
     let Error = {};
     if (!req.body.title) {
         Error.title = "Title cannot be empty!";
@@ -14,8 +13,12 @@ const regValid = function(req, res, next) {
         Error.email = "Email cannot be empty!";
     }
 
-    if (!req.body.password) {
+    if (!req.body.password && !req.body.user) {
         Error.password = "Password cannot be empty!";
+    }
+
+    if ((req.body.password !== req.body.password_confirmation) && !req.body.user) {
+        Error.password_confirm = "Your Passwords do not match";
     }
 
     if (!req.body.department) {
@@ -26,7 +29,7 @@ const regValid = function(req, res, next) {
         Error.user_type = "Permisson type cannot be empty!";
     }
     if (JSON.stringify(Error) !== '{}') {
-        res.json({Error});
+        res.status(200).json({Error});
         return
     }
     next();

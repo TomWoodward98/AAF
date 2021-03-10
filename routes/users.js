@@ -12,19 +12,19 @@ const authSupport = require('../middleware/auth/authSupport');
 const authAdminSupport = require('../middleware/auth/authAdminSupport');
 // ------------------------------------------------------------------------\\
 
-// ---------------------- Validation middleware --------------------------------\\
+// ---------------------- Validation middleware ---------------------------\\
 const loginValid = require('../middleware/validation/loginValid');
-const regValid = require('../middleware/validation/regValid');
+const regUserValid = require('../middleware/validation/regValid');
 // ------------------------------------------------------------------------\\
 
 const UserController = require('../controllers/userController');
 const LoginController = require('../controllers/loginController');
 
-router.post('/api/register', regValid, UserController.create);
+router.post('/api/register', regUserValid, UserController.create);
 router.post('/api/login', loginValid, LoginController.login);
 router.post('/api/logout', withAuth,  LoginController.logout);
 
-router.post('/api/update-user', authAdmin, UserController.update); // Admin protection
+router.post('/api/update-user', [authAdmin, regUserValid], UserController.update); // Admin protection
 router.get('/api/get-users', authAdminSupport, UserController.get); // Admin and Support
 router.post('/api/delete-user', authAdmin, UserController.delete); //Admin protection
 
