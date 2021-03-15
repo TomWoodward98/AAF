@@ -39,16 +39,17 @@ exports.create = (req, res) => {
                 created_by: funct.user,
                 raised_by: req.body.raisedBy,
                 status: statusDoc,
+                chat: null,
                 created_at: ticket.created_at,
             }
-            res.send(newTicket, 200);
+            res.status(200).send(newTicket, 200);
         }
     });
 };
 
 exports.get = (req, res) => {
     if (req.user.user_type.type === 'client') {
-        Ticket.find({'raised_by': req.user._id}).populate(['created_by', 'allocated_to', 'raised_by', 'status']).exec(function (err, data) {
+        Ticket.find({'raised_by': req.user._id}).populate(['created_by', 'allocated_to', 'raised_by', 'status', 'chat']).exec(function (err, data) {
             if (err) {
                 res.status(500).send({
                     message:err.message || "Some error occurred while retrieving Tickets."
@@ -57,7 +58,7 @@ exports.get = (req, res) => {
             res.send(data);
         });
     } else {
-        Ticket.find().populate(['created_by', 'allocated_to', 'raised_by', 'status']).exec(function (err, data) {
+        Ticket.find().populate(['created_by', 'allocated_to', 'raised_by', 'status', 'chat']).exec(function (err, data) {
             if (err) {
                 res.status(500).send({
                     message:err.message || "Some error occurred while retrieving Tickets."
