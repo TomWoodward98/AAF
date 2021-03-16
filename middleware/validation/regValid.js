@@ -17,7 +17,7 @@ const regValid = function(req, res, next) {
         Error.password = "Password cannot be empty!";
     }
 
-    if ((req.body.password !== req.body.password_confirmation) && !req.body.user) {
+    if (req.body.password !== req.body.password_confirmation) {
         Error.password_confirm = "Your Passwords do not match";
     }
 
