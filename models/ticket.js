@@ -31,6 +31,11 @@ let ticketSchema = new Schema({
     ref: 'Chat',
     default: null,
   },
+  department: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Department',
+    default: null,
+  },
   created_by: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'

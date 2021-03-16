@@ -24,8 +24,10 @@ exports.create = (req, res) => {
     }
     
     const status = statusDoc._id;
+    
+    const department = req.body.raisedBy.department._id;
 
-    const ticket = new Ticket({ title, info, allocated_to, created_by, raised_by, status });
+    const ticket = new Ticket({ title, info, allocated_to, created_by, raised_by, status, department });
     ticket.save(function(err) {
         if (err) {
             res.status(500).send("Error creating your ticket, try again.");
@@ -40,6 +42,7 @@ exports.create = (req, res) => {
                 raised_by: req.body.raisedBy,
                 status: statusDoc,
                 chat: null,
+                department: department,
                 created_at: ticket.created_at,
             }
             res.status(200).send(newTicket, 200);
@@ -49,7 +52,7 @@ exports.create = (req, res) => {
 
 exports.get = (req, res) => {
     if (req.user.user_type.type === 'client') {
-        Ticket.find({'raised_by': req.user._id}).populate(['created_by', 'allocated_to', 'raised_by', 'status', 'chat']).exec(function (err, data) {
+        Ticket.find({'raised_by': req.user._id}).populate(['created_by', 'allocated_to', 'raised_by', 'status', 'chat', 'department']).exec(function (err, data) {
             if (err) {
                 res.status(500).send({
                     message:err.message || "Some error occurred while retrieving Tickets."
@@ -58,7 +61,7 @@ exports.get = (req, res) => {
             res.send(data);
         });
     } else {
-        Ticket.find().populate(['created_by', 'allocated_to', 'raised_by', 'status', 'chat']).exec(function (err, data) {
+        Ticket.find().populate(['created_by', 'allocated_to', 'raised_by', 'status', 'chat', 'department']).exec(function (err, data) {
             if (err) {
                 res.status(500).send({
                     message:err.message || "Some error occurred while retrieving Tickets."
