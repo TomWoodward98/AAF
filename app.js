@@ -11,7 +11,7 @@ const app = express();
 //-------------------- Socket ---------------------\\
 const server = require("http").createServer();
 const io = require('socket.io')(server, { cors: { origin: "*", }, });
-const PORT = 4000;
+const PORT = process.env.SOCKET_PORT;
 
 io.on("connection", (socket) => {
     console.log(`Client ${socket.id} connected`);
@@ -45,7 +45,7 @@ app.use(cookieParser());
 
 app.use(cors({
     origin: [
-        'http://localhost:8080',
+        'http://localhost:' + process.env.FE_PORT,
     ],
     credentials: true,
 }));
@@ -56,8 +56,8 @@ db.mongoose.connect(db.uri, {
     useUnifiedTopology: true
 }).then(() => {
     console.log('Connected to the database!');
-    app.listen(3000, () => {
-        console.log(`Express is running on port 3000`);
+    app.listen(process.env.BE_PORT, () => {
+        console.log(`Express is running on port ` + process.env.BE_PORT);
     });
 }).catch(err => {
     console.log('Cannot connect to the database!', err);

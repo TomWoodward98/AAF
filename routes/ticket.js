@@ -5,6 +5,7 @@ const router = express.Router();
 const withAuth = require('../middleware/auth/withAuth');
 const authAdmin = require('../middleware/auth/authAdmin');
 const authSupport = require('../middleware/auth/authSupport');
+const authClient = require('../middleware/auth/authClient');
 // ------------------------------------------------------------------\\
 
 // ---------------------- Validation middleware ----------------------\\
@@ -19,7 +20,7 @@ const getStatuses = require('../middleware/statuses');
 const TicketController = require('../controllers/ticketController');
 const ColumnController = require('../controllers/columnController');
 
-router.post('/create-ticket', [withAuth, getStatuses, createTicketValid], TicketController.create);
+router.post('/create-ticket', [authSupport, authClient, getStatuses, createTicketValid], TicketController.create);
 
 router.get('/get-tickets', currentUser, TicketController.get);
 
