@@ -6,10 +6,8 @@ const ObjectID = require('mongodb').ObjectID;
 const secret = process.env.SECRET
 
 exports.create = (req, res) => {
-    const token = req.cookies.token;
-    const funct = jwt.verify(token, secret);
 
-    const created_by = funct.user._id;
+    const created_by = req.user._id;
     const { info, title, allocatedTo, raisedBy } = req.body;
 
     const allocated_to = allocatedTo ? allocatedTo._id : null;
@@ -30,6 +28,7 @@ exports.create = (req, res) => {
     const ticket = new Ticket({ title, info, allocated_to, created_by, raised_by, status, department });
     ticket.save(function(err) {
         if (err) {
+            console.log(err);
             res.status(500).send("Error creating your ticket, try again.");
         } else {
             const newTicket = 
@@ -38,14 +37,14 @@ exports.create = (req, res) => {
                 title: ticket.title,
                 info: ticket.info,
                 allocated_to: req.body.allocatedTo,
-                created_by: funct.user,
+                created_by: req.user,
                 raised_by: req.body.raisedBy,
                 status: statusDoc,
                 chat: null,
                 department: department,
                 created_at: ticket.created_at,
             }
-            res.status(200).send(newTicket, 200);
+            res.status(200).send(newTicket);
         }
     });
 };
@@ -58,7 +57,7 @@ exports.get = (req, res) => {
                     message:err.message || "Some error occurred while retrieving Tickets."
                 });
             }
-            res.send(data);
+            res.status(200).send(data);
         });
     } else {
         Ticket.find().populate(['created_by', 'allocated_to', 'raised_by', 'status', 'chat', 'department']).exec(function (err, data) {
@@ -67,7 +66,7 @@ exports.get = (req, res) => {
                     message:err.message || "Some error occurred while retrieving Tickets."
                 });
             }
-            res.send(data);
+            res.status(200).send(data);
         });
     }
 };
@@ -87,6 +86,7 @@ exports.update = (req, res) => {
         }, 
         function(err, doc) {
             if (err) {
+                console.log('hit here', err, doc);
                 res.status(500).send("Error editting your ticket, try again.");
             } else {
                 const updatedTicket = 

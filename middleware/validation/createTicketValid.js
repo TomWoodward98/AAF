@@ -1,6 +1,5 @@
 const createTicketValid = function(req, res, next) {
-    let Error = {};
-    
+    let Error = {}
     if (!req.body.title) {
         Error.title = "Title cannot be empty!";
     }

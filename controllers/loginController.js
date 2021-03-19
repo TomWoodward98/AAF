@@ -47,8 +47,7 @@ exports.login = (req, res) => {
 };
 
 exports.logout = (req, res) => {
-    const user = req.currentUser
-    const payload = { user };
+    const payload = { user: null };
 
     const token = jwt.sign(payload, secret, {
         expiresIn: Date.now()

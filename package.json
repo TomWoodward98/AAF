@@ -4,13 +4,14 @@
   "description": "",
   "scripts": {
     "start": "nodemon ./app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": "Tom",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "chai-http": "^4.3.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
@@ -22,6 +23,8 @@
   },
   "devDependencies": {
     "@vue/cli": "^4.5.11",
+    "chai": "^4.3.4",
+    "mocha": "^8.3.2",
     "nodemon": "^2.0.7"
   }
 }
