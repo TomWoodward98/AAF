@@ -86,19 +86,20 @@ exports.update = (req, res) => {
         }, 
         function(err, doc) {
             if (err) {
-                console.log('hit here', err, doc);
                 res.status(500).send("Error editting your ticket, try again.");
             } else {
                 const updatedTicket = 
                 {
                     _id: id,
                     title: title,
+                    department: doc.department,
                     info: info,
                     allocated_to: req.body.allocatedTo ? req.body.allocatedTo : ticket.allocated_to,
                     created_by: ticket.created_by,
                     raised_by: ticket.raised_by,
                     status: req.body.status ? req.body.status : ticket.status,
                     created_at: ticket.created_at,
+                    chat: doc.chat
                 }
                 res.status(200).send(updatedTicket);            
             }
